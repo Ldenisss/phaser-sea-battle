@@ -5,7 +5,7 @@ import { EventBus } from '../EventBus';
 export class MainMenu extends Scene
 {
     background: GameObjects.Image;
-    logo: GameObjects.Image;
+    startButton: GameObjects.Image;
     title: GameObjects.Text;
     logoTween: Phaser.Tweens.Tween | null;
 
@@ -16,16 +16,25 @@ export class MainMenu extends Scene
 
     create ()
     {
-        this.background = this.add.image(512, 384, 'background');
+        this.background = this.add.image(this.cameras.main.width/2, this.cameras.main.height / 2, 'background');
 
-        this.logo = this.add.image(512, 300, 'logo').setDepth(100);
+        let scaleX = this.cameras.main.width / this.background.width
+        let scaleY = this.cameras.main.height / this.background.height
+        let scale = Math.max(scaleX, scaleY)
+        this.background.setScale(scale).setScrollFactor(0)
+        
 
-        this.title = this.add.text(512, 460, 'Main Menu', {
+        this.title = this.add.text(this.cameras.main.width/2, this.cameras.main.height / 2 - 300, 'Sea Battle', {
             fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
             stroke: '#000000', strokeThickness: 8,
             align: 'center'
-        }).setOrigin(0.5).setDepth(100);
+        }).setOrigin(0.5).setDepth(100)
 
+
+        this.startButton = this.add.image(this.cameras.main.width/2, this.cameras.main.height / 2 ,  'buttonStart').setDepth(100).setInteractive()
+        .on('pointerdown', () => this.changeScene() )
+
+        
         EventBus.emit('current-scene-ready', this);
     }
     
@@ -56,7 +65,7 @@ export class MainMenu extends Scene
         else
         {
             this.logoTween = this.tweens.add({
-                targets: this.logo,
+                targets: this.startButton,
                 x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
                 y: { value: 80, duration: 1500, ease: 'Sine.easeOut' },
                 yoyo: true,
@@ -65,8 +74,8 @@ export class MainMenu extends Scene
                     if (reactCallback)
                     {
                         reactCallback({
-                            x: Math.floor(this.logo.x),
-                            y: Math.floor(this.logo.y)
+                            x: Math.floor(this.startButton.x),
+                            y: Math.floor(this.startButton.y)
                         });
                     }
                 }
